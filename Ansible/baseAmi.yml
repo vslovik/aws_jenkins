@@ -1,0 +1,13 @@
+---
+- name: setup of base AMI, all infrastructure, etc
+  hosts: all
+  sudo: yes
+  gather_facts: yes
+  roles:
+    - role: jenkins
+      jenkins_connection_retries: 100
+      jenkins_plugins:
+        - git
+        - ssh
+        - ec2
+    - role: common

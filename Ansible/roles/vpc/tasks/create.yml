@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    region: us-east-1
+    prefix: testing
+    az: us-east-1a
+  tasks:
+    - name: create vpc
+      local_action:
+        module: ec2_vpc
+        region: "{{ region }}"
+        cidr_block: 10.0.0.0/16
+        resource_tags: '{"Name":"{{ prefix }}_vpc"}'
+        subnets:
+          - cidr: 10.0.0.0/24
+            az: "{{ az }}"
+            resource_tags: '{"Name":"{{ prefix }}_subnet_public"}'
+          - cidr: 10.0.1.0/24
+            az: "{{ az }}"
+            resource_tags: '{"Name":"{{ prefix }}_subnet_private"}'
+        internet_gateway: yes
+        route_tables:
+          - subnets:
+              - 10.0.0.0/24
+            routes:
+              - dest: 0.0.0.0/0
+                gw: igw
+      register: vpc
+
+    - file: path=./{{ prefix }}_vpc_info state=touch mode=0777
+
+    - name: "write vpc id to {{ prefix }}_vpc_info file"
+      lineinfile:
+        dest: ./{{ prefix }}_vpc_info
+        regexp: "_vpc"
+        line: "{{ prefix }}_vpc: {{ vpc.vpc_id }}"
+
+    - name: "write subnets id to {{ prefix }}_vpc_info file"
+      lineinfile:
+        dest: ./{{ prefix }}_vpc_info
+        regexp: "{{ item.resource_tags.Name }}"
+        line: "{{ item.resource_tags.Name }}: {{ item.id }}"
+      with_items: vpc.subnets

@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    region: us-east-1
+  vars_files:
+    - ./testing_vpc_info
+  tasks:
+    - name: delete vpc
+      local_action:
+        module: ec2_vpc
+        region: "{{ region }}"
+        state: absent
+        resource_tags: '{"Name":"testing_vpc"}'
+        vpc_id: "{{ testing_vpc }}"
+        wait: yes
