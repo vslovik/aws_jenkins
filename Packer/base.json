@@ -1,7 +1,7 @@
 {
     "variables": {
-        "aws_access_key": "AKIAJ4HNL5UVCPQ4ZCXQ",
-        "aws_secret_key": "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",
+        "aws_access_key": "ACCESSKEY",
+        "aws_secret_key": "SECRETKEY",
         "app_key": "app_key",
         "version": "v0-0-0",
         "env": "packer"
